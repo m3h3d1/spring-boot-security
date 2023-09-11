@@ -39,4 +39,19 @@ public class JWTUtils {
             returnValue.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
         return new String(returnValue);
     }
+
+    public static String extractUser(String token) {
+        try {
+            // Parse the JWT token
+            Claims claims = Jwts.parser()
+                    .setSigningKey(AppConstants.TOKEN_SECRET)
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // Extract the user information (subject) from the claims
+            return claims.getSubject();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

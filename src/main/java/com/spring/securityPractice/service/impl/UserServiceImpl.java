@@ -69,26 +69,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return returnedValue;
     }
 
-
-//    @Override
-//    public UserDto createUser(UserDto user) throws Exception {
-//        ModelMapper modelMapper = new ModelMapper();
-//        if(userRepository.findByEmail(user.getEmail()).isPresent())
-//            throw new Exception("Record already exists");
-//
-//        UserEntity userEntity = new UserEntity();
-//        userEntity.setEmail(user.getEmail());
-//        userEntity.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-//        String publicUserId = JWTUtils.generateUserID(10);
-//        userEntity.setUserId(publicUserId);
-//
-//        UserEntity storedUserDetails =userRepository.save(userEntity);
-//        String accessToken = JWTUtils.generateToken(publicUserId); // Generate a JWT for the registered user
-//        UserDto returnedValue = modelMapper.map(storedUserDetails,UserDto.class); // Map the stored user details to a UserDto
-//        returnedValue.setToken(accessToken);
-//        return returnedValue;
-//    }
-
     @Override
     public UserDto getUser(String email) {
         UserEntity userEntity = userRepository.findByEmail(email).get();

@@ -46,28 +46,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         }
     }
 
-//    @Override
-//    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-//        String user = ((User) authResult.getPrincipal()).getUsername();
-//        String accessToken = JWTUtils.generateToken(user);
-//        UserService userService = (UserService) SpringApplicationContext.getBean("userServiceImpl");
-//        UserDto userDto = userService.getUser(user);
-//
-//        userDto.setToken(accessToken); // Token to the response body
-//
-//        // token (userDto) to JSON and write it to response body
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String userJson = objectMapper.writeValueAsString(userDto);
-//        response.setContentType("application/json");
-//        response.getWriter().write(userJson);
-//
-//        // token to response header
-//        response.addHeader("userId", userDto.getUserId());
-//        response.addHeader(AppConstants.HEADER_STRING, AppConstants.TOKEN_PREFIX + accessToken);
-//    }
-
-
-
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         try {
