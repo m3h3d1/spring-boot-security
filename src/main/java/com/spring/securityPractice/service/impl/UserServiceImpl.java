@@ -1,7 +1,11 @@
 package com.spring.securityPractice.service.impl;
 
+import java.util.HashSet; // Import HashSet
+
+import com.spring.securityPractice.entity.RoleEntity;
 import com.spring.securityPractice.entity.UserEntity;
 import com.spring.securityPractice.model.UserDto;
+import com.spring.securityPractice.repository.RoleRepository;
 import com.spring.securityPractice.repository.UserRepository;
 import com.spring.securityPractice.service.UserService;
 import com.spring.securityPractice.utils.JWTUtils;
@@ -16,8 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -26,11 +29,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Override
     public UserDto createUser(UserDto user) throws Exception {
         ModelMapper modelMapper = new ModelMapper();
-        if(userRepository.findByEmail(user.getEmail()).isPresent())
+        if (userRepository.findByEmail(user.getEmail()).isPresent())
             throw new Exception("Record already exists");
 
         UserEntity userEntity = new UserEntity();
@@ -39,12 +46,48 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         String publicUserId = JWTUtils.generateUserID(10);
         userEntity.setUserId(publicUserId);
 
-        UserEntity storedUserDetails =userRepository.save(userEntity); // Save the user entity to the database
-        String accessToken = JWTUtils.generateToken(publicUserId); // Generate a JWT for the registered user
-        UserDto returnedValue = modelMapper.map(storedUserDetails,UserDto.class); // Map the stored user details to a UserDto
+        // Determine the role based on user roles
+        RoleEntity userRole = roleRepository.findByRoleName("user")
+                .orElseThrow(() -> new Exception("Role not found: user"));
+
+        List<RoleEntity> roles = new ArrayList<>();
+
+        if (user.getRoles() != null && user.getRoles().contains("admin")) {
+            RoleEntity adminRole = roleRepository.findByRoleName("admin")
+                    .orElseThrow(() -> new Exception("Role not found: admin"));
+            roles.add(adminRole);
+        } else {
+            roles.add(userRole);
+        }
+
+        userEntity.setRoles(roles);
+
+        UserEntity storedUserDetails = userRepository.save(userEntity);
+        String accessToken = JWTUtils.generateToken(publicUserId);
+        UserDto returnedValue = modelMapper.map(storedUserDetails, UserDto.class);
         returnedValue.setToken(accessToken);
         return returnedValue;
     }
+
+
+//    @Override
+//    public UserDto createUser(UserDto user) throws Exception {
+//        ModelMapper modelMapper = new ModelMapper();
+//        if(userRepository.findByEmail(user.getEmail()).isPresent())
+//            throw new Exception("Record already exists");
+//
+//        UserEntity userEntity = new UserEntity();
+//        userEntity.setEmail(user.getEmail());
+//        userEntity.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+//        String publicUserId = JWTUtils.generateUserID(10);
+//        userEntity.setUserId(publicUserId);
+//
+//        UserEntity storedUserDetails =userRepository.save(userEntity);
+//        String accessToken = JWTUtils.generateToken(publicUserId); // Generate a JWT for the registered user
+//        UserDto returnedValue = modelMapper.map(storedUserDetails,UserDto.class); // Map the stored user details to a UserDto
+//        returnedValue.setToken(accessToken);
+//        return returnedValue;
+//    }
 
     @Override
     public UserDto getUser(String email) {

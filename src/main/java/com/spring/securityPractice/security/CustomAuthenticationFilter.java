@@ -68,19 +68,19 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
 
 
-//    @Override
-//    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-//        try {
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            response.setContentType("application/json");
-//            String errorMassage = "Authentication Unsuccessful.";
-//            String errorJson = "{\"Error: \"" + errorMassage + "\"\"}";
-//            response.getWriter().write(errorJson);
-//        } catch (Exception e) {
-//            log.info("Exception occured at unsuccessfulAuthentication method: {}",e.getLocalizedMessage());
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        try {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            String errorMassage = "Authentication Unsuccessful.";
+            String errorJson = "{\"Error: \"" + errorMassage + "\"\"}";
+            response.getWriter().write(errorJson);
+        } catch (Exception e) {
+            log.info("Exception occured at unsuccessfulAuthentication method: {}",e.getLocalizedMessage());
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
